@@ -87,7 +87,7 @@ export const CartChecking = (): JSX.Element => {
                                         <div>Артикул: {item.item_id}</div>
                                         <div>{item.price}₽</div>
                                         <div>куплено - {item.quantity}</div>
-                                        <Tag color="magenta">{item.category_noun}</Tag>
+                                        <Tag color="volcano">{item.category_noun}</Tag>
                                     </Space>}
                                 />
                             </List.Item>
