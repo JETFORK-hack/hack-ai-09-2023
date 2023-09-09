@@ -130,6 +130,7 @@ export const Products = (): JSX.Element => {
                 <>
                     <br />
                     <br />
+                    <br />
                     <Divider>Выбранные товары</Divider>
                     <List
                         bordered
@@ -141,130 +142,133 @@ export const Products = (): JSX.Element => {
                         )}
                     />
                     <br />
-                    <br />
-                    <div style={{ textAlign: 'center' }}>
-                        <Button type="primary">Получить рекомендации</Button>
-                    </div>
-
                 </>
             )}
             <br />
             <br />
-            <Divider>Рекомендации</Divider>
-            <br />
-            <Carousel
-                additionalTransfrom={0}
-                // arrows
-                autoPlay
-                autoPlaySpeed={3500}
-                // centerMode={false}
-                // className=""
-                // containerClass="container-with-dots"
-                // dotListClass=""
-                draggable
-                focusOnSelect={false}
-                infinite={false}
-                // itemClass=""
-                keyBoardControl
-                // minimumTouchDrag={80}
-                pauseOnHover
-                renderArrowsWhenDisabled={false}
-                renderButtonGroupOutside={false}
-                renderDotsOutside={false}
-                responsive={{
-                    superLargeDesktop: {
-                        breakpoint: { max: 4000, min: 3000 },
-                        items: 5,
-                        partialVisibilityGutter: 40,
-                    },
-                    desktop: {
-                        breakpoint: { max: 3000, min: 1700 },
-                        items: 4,
-                        partialVisibilityGutter: 30,
-                    },
-                    desktopMini: {
-                        breakpoint: { max: 1700, min: 1024 },
-                        partialVisibilityGutter: 30,
-                        items: 3,
-                    },
-                    tablet: {
-                        breakpoint: { max: 1024, min: 624 },
-                        items: 2
-                    },
-                    mobile: {
-                        breakpoint: { max: 624, min: 0 },
-                        items: 1
-                    }
-                }}
-                slidesToSlide={2}
-            // swipeable
-            >
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Наименование товара" description="Описание товара" />
-                </Card>
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Наименование товара" description="Описание товара" />
-                </Card>
+            {selectedItems.length > 0 &&
+                <>
+                    <Divider>Рекомендации</Divider>
+                    <br />
+                    <Carousel
+                        additionalTransfrom={0}
+                        // arrows
+                        autoPlay
+                        autoPlaySpeed={3500}
+                        // centerMode={false}
+                        // className=""
+                        // containerClass="container-with-dots"
+                        // dotListClass=""
+                        draggable
+                        focusOnSelect={false}
+                        infinite={false}
+                        // itemClass=""
+                        keyBoardControl
+                        // minimumTouchDrag={80}
+                        pauseOnHover
+                        renderArrowsWhenDisabled={false}
+                        renderButtonGroupOutside={false}
+                        renderDotsOutside={false}
+                        responsive={{
+                            superLargeDesktop: {
+                                breakpoint: { max: 4000, min: 3000 },
+                                items: 5,
+                                partialVisibilityGutter: 40,
+                            },
+                            desktop: {
+                                breakpoint: { max: 3000, min: 1700 },
+                                items: 4,
+                                partialVisibilityGutter: 30,
+                            },
+                            desktopMini: {
+                                breakpoint: { max: 1700, min: 1024 },
+                                partialVisibilityGutter: 30,
+                                items: 3,
+                            },
+                            tablet: {
+                                breakpoint: { max: 1024, min: 624 },
+                                items: 2
+                            },
+                            mobile: {
+                                breakpoint: { max: 624, min: 0 },
+                                items: 1
+                            }
+                        }}
+                        slidesToSlide={2}
+                    // swipeable
+                    >
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
 
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Наименование товара" description="Описание товара" />
-                </Card>
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
 
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Наименование товара" description="Описание товара" />
-                </Card>
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Наименование товара" description="Описание товара" />
-                </Card>
-                <Card
-                    hoverable
-                    style={{ width: 240, marginBottom: 20 }}
-                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-                >
-                    <Card.Meta title="Europe Street beat" description="Описание товара" />
-                </Card>
-            </Carousel>
-            <br />
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
+                        <Card
+                            hoverable
+                            style={{ width: 240 }}
+                            actions={[
+                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                            ]}
+                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                        >
+                            <Card.Meta title="Наименование товара" description="Описание товара" />
+                        </Card>
+                    </Carousel>
+                    <br />
+                </>
+            }
         </>
     )
 };
