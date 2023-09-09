@@ -171,20 +171,28 @@ export const CartChecking = (): JSX.Element => {
                                         hoverable
                                         style={{ minWidth: 150, height: '45%' }}
                                         // cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
-                                        cover={<img alt="Изображение товара" src={cartInfo.predict.candidate.category_url
-                                            ? cartInfo.predict.candidate.category_url
-                                            : unknownBoxes} onError={({ currentTarget }) => {
-                                                currentTarget.onerror = null; // prevents looping
-                                                currentTarget.src = unknownBoxes;
-                                            }} />}
+                                        cover={<img alt="Изображение товара"
+                                            width="189" height="200"
+                                            src={cartInfo.predict.candidate.category_url
+                                                ? cartInfo.predict.candidate.category_url
+                                                : unknownBoxes} onError={({ currentTarget }) => {
+                                                    currentTarget.onerror = null; // prevents looping
+                                                    currentTarget.src = unknownBoxes;
+                                                }} />}
                                     >
-                                        <Meta title={<Tooltip title={cartInfo.predict.candidate.name}>{cartInfo.predict.candidate.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
-                                            <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
-                                            <div>Цена: {cartInfo.predict.candidate.price}₽</div>
-                                            <Tooltip title={'Категория: ' + cartInfo.predict.candidate.category_noun}>
-                                                <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
-                                            </Tooltip>
-                                        </Space>} />
+                                        <Meta
+                                            title={
+                                                <Tooltip title={cartInfo.predict.candidate.name}><div style={{
+                                                    whiteSpace: 'pre-line',
+                                                }}>{cartInfo.predict.candidate.name}</div></Tooltip>}
+                                            description={<Space direction="horizontal" split={'  '}>
+                                                <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
+                                                <div>Цена: {cartInfo.predict.candidate.price}₽</div>
+                                                <Tooltip title={'Категория: ' + cartInfo.predict.candidate.category_noun}>
+                                                    <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
+                                                </Tooltip>
+                                            </Space>}
+                                        />
                                     </Card>
                                 </Col>
                                 <Col sm={16} md={2} style={{ alignContent: 'center', justifyContent: 'center', display: 'flex' }}>
@@ -201,20 +209,28 @@ export const CartChecking = (): JSX.Element => {
                                         <Card
                                             hoverable
                                             style={{ minWidth: 150, height: '45%' }}
-                                            cover={<img alt="Изображение товара" src={cartInfo.predict.target.category_url
-                                                ? cartInfo.predict.target.category_url
-                                                : unknownBoxes} onError={({ currentTarget }) => {
-                                                    currentTarget.onerror = null; // prevents looping
-                                                    currentTarget.src = unknownBoxes;
-                                                }} />}
+                                            cover={<img alt="Изображение товара"
+                                                width="150" height="200"
+                                                src={cartInfo.predict.target.category_url
+                                                    ? cartInfo.predict.target.category_url
+                                                    : unknownBoxes} onError={({ currentTarget }) => {
+                                                        currentTarget.onerror = null; // prevents looping
+                                                        currentTarget.src = unknownBoxes;
+                                                    }} />}
                                         >
-                                            <Meta title={<Tooltip title={cartInfo.predict.target.name}>{cartInfo.predict.target.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
-                                                <div>Артикул: {cartInfo.predict.target.item_id}</div>
-                                                <div>Цена: {cartInfo.predict.target.price}₽</div>
-                                                <Tooltip title={'Категория: ' + cartInfo.predict.target.category_noun}>
-                                                    <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
-                                                </Tooltip>
-                                            </Space>} />
+                                            <Meta
+                                                title={
+                                                    <Tooltip title={cartInfo.predict.target.name}><div style={{
+                                                        whiteSpace: 'pre-line',
+                                                    }}>{cartInfo.predict.target.name}</div></Tooltip>}
+                                                description={<Space direction="horizontal" split={'  '}>
+                                                    <div>Артикул: {cartInfo.predict.target.item_id}</div>
+                                                    <div>Цена: {cartInfo.predict.target.price}₽</div>
+                                                    <Tooltip title={'Категория: ' + cartInfo.predict.target.category_noun}>
+                                                        <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
+                                                    </Tooltip>
+                                                </Space>}
+                                            />
                                         </Card>
                                     </Badge.Ribbon>
                                 </Col>
