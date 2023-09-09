@@ -1,8 +1,19 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import BIGINT
 
 
 from app.db import Base
+
+
+class Categories(Base):
+    __tablename__ = 'categories'
+
+    category: Mapped[str] = mapped_column(primary_key=True)
+    url: Mapped[str] = mapped_column()
+
+    receipts: Mapped["Receipts"] = relationship("Receipts", back_populates="category")
+    # receipts = relationship("Receipts", back_populates="category")
 
 
 class Receipts(Base):
@@ -14,7 +25,11 @@ class Receipts(Base):
     type: Mapped[str] = mapped_column(primary_key=True)
     quantity: Mapped[float] = mapped_column()
     price: Mapped[float] = mapped_column()
-    category_noun: Mapped[str] = mapped_column()
+    category_noun: Mapped[str] = mapped_column(ForeignKey("categories.category"))
+    
+    category: Mapped[Categories] = relationship("Categories", back_populates="receipts")
+    # category = relationship("Categories", back_populates="receipts")
+
 
 class PredictCart(Base):
     __tablename__ = "predict"

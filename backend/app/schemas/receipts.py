@@ -17,6 +17,7 @@ class ReceiptsOut(BaseModel):
     quantity: float
     price: float
     category_noun: str
+    category_url: str | None
 
     class Config:
         orm_mode = True

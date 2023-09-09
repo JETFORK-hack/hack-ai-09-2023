@@ -29,6 +29,7 @@ export interface ICartInfo {
     quantity: number;
     price: number;
     category_noun: string;
+    category_url: string | null;
 }
 
 interface ICardInfoPredict {

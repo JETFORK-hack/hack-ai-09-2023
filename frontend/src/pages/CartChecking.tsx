@@ -1,4 +1,4 @@
-import { Alert, AutoComplete, Avatar, Badge, Button, Card, Col, Divider, Form, Input, List, Row, Space, Spin, Tag, Tooltip, Typography, message } from 'antd';
+import { Alert, AutoComplete, Avatar, Badge, Button, Card, Col, Image, Form, Input, List, Row, Space, Spin, Tag, Tooltip, Typography, message } from 'antd';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
@@ -6,7 +6,10 @@ import axios from 'axios';
 import { basePath } from '../providers/env';
 import Meta from 'antd/es/card/Meta';
 import debounce from 'lodash.debounce';
-import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, QuestionOutlined } from '@ant-design/icons';
+
+import unknownLogoGroup from '../unknow_item.webp';
+import unknownBoxes from '../boxes.jpg';
 
 const { Text } = Typography;
 
@@ -136,7 +139,17 @@ export const CartChecking = (): JSX.Element => {
                         renderItem={(item: ICartInfo, index) => (
                             <List.Item>
                                 <List.Item.Meta
-                                    avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                                    avatar={<Avatar src={item.category_url
+                                        ? <img
+                                            src={item.category_url}
+                                            onError={({ currentTarget }) => {
+                                                currentTarget.onerror = null; // prevents looping
+                                                currentTarget.src = unknownLogoGroup;
+                                            }}
+                                        />
+                                        : unknownLogoGroup}
+                                        draggable={false}
+                                    />}
                                     title={item.name}
                                     description={<Space direction="horizontal" split={'  '}>
                                         <div>Артикул: {item.item_id}</div>
@@ -157,7 +170,13 @@ export const CartChecking = (): JSX.Element => {
                                     <Card
                                         hoverable
                                         style={{ minWidth: 150, height: '45%' }}
-                                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                        // cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                        cover={<img alt="Изображение товара" src={cartInfo.predict.candidate.category_url
+                                            ? cartInfo.predict.candidate.category_url
+                                            : unknownBoxes} onError={({ currentTarget }) => {
+                                                currentTarget.onerror = null; // prevents looping
+                                                currentTarget.src = unknownBoxes;
+                                            }} />}
                                     >
                                         <Meta title={<Tooltip title={cartInfo.predict.candidate.name}>{cartInfo.predict.candidate.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
                                             <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
@@ -182,7 +201,12 @@ export const CartChecking = (): JSX.Element => {
                                         <Card
                                             hoverable
                                             style={{ minWidth: 150, height: '45%' }}
-                                            cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                            cover={<img alt="Изображение товара" src={cartInfo.predict.target.category_url
+                                                ? cartInfo.predict.target.category_url
+                                                : unknownBoxes} onError={({ currentTarget }) => {
+                                                    currentTarget.onerror = null; // prevents looping
+                                                    currentTarget.src = unknownBoxes;
+                                                }} />}
                                         >
                                             <Meta title={<Tooltip title={cartInfo.predict.target.name}>{cartInfo.predict.target.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
                                                 <div>Артикул: {cartInfo.predict.target.item_id}</div>

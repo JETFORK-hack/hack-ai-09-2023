@@ -5,9 +5,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.deps.db import get_async_session
-from app.models.receipts import PredictCart, Receipts
+from app.models.receipts import Categories, PredictCart, Receipts
 from app.schemas.receipts import PredictCartOut, ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut
-from sqlalchemy import exc, select, cast, String
+from sqlalchemy import exc, func, select, cast, String
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
@@ -81,10 +81,15 @@ async def find_receipts_by_id(
 ):
     try:
         result = await session.execute(
-                    select(Receipts)
+                    select(
+                        Receipts.receipt_id, Receipts.item_id, Receipts.name,
+                        Receipts.type, Receipts.quantity, Receipts.price,
+                        Receipts.category_noun, Categories.url.label('category_url')
+                        )
+                    .join(Categories, Receipts.category_noun == Categories.category)
                     .where(Receipts.receipt_id == _id)
                 )
-        items = result.scalars().all()
+        items = result.all()
         predict = await session.execute(
             select(PredictCart)
             .where(PredictCart.receipt_id == _id)
@@ -92,17 +97,28 @@ async def find_receipts_by_id(
         predict = predict.scalars().first()
         if predict:
             target = session.execute(
-                select(Receipts)
+                select(
+                    Receipts.receipt_id, Receipts.item_id, Receipts.name,
+                    Receipts.type, Receipts.quantity, Receipts.price,
+                    Receipts.category_noun, Categories.url.label('category_url'))
+                .join(Categories, Receipts.category_noun == Categories.category)
                 .where(Receipts.item_id == predict.target)
+                .order_by(Receipts.price.desc())
             )
             candidate = session.execute(
-                select(Receipts)
+                select(
+                    Receipts.receipt_id, Receipts.item_id, Receipts.name,
+                    Receipts.type, Receipts.quantity, Receipts.price,
+                    Receipts.category_noun, Categories.url.label('category_url'))
+                .join(Categories, Receipts.category_noun == Categories.category)
                 .where(Receipts.item_id == predict.candidate)
+                .order_by(Receipts.price.desc())
             )
             target, candidate = await asyncio.gather(target, candidate)
+
             return ReceiptsByIdOut(items=items, predict=PredictCartOut(
-                target=target.scalars().first(),
-                candidate=candidate.scalars().first(),
+                target=target.first(),
+                candidate=candidate.first(),
                 proba=predict.proba
             ))
         
