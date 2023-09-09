@@ -1,4 +1,4 @@
-import { Alert, AutoComplete, Avatar, Badge, Button, Card, Divider, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
+import { Alert, AutoComplete, Avatar, Badge, Button, Card, Col, Divider, Form, Input, List, Row, Space, Spin, Tag, Tooltip, Typography, message } from 'antd';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
@@ -6,6 +6,9 @@ import axios from 'axios';
 import { basePath } from '../providers/env';
 import Meta from 'antd/es/card/Meta';
 import debounce from 'lodash.debounce';
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+
+const { Text } = Typography;
 
 
 export const CartChecking = (): JSX.Element => {
@@ -149,11 +152,57 @@ export const CartChecking = (): JSX.Element => {
                     {cartInfo.predict && cartInfo.predict.target && cartInfo.predict.candidate && (
                         <>
                             <h1>К этой корзине рекомендуем</h1>
-                            <Space direction="horizontal" size="middle" style={{ display: 'flex' }} split={<Divider />}>
+                            <Row gutter={16} align='middle' justify='center'>
+                                <Col sm={16} md={7}>
+                                    <Badge.Ribbon text="Куплено" >
+                                        <Card
+                                            hoverable
+                                            style={{ minWidth: 150, height: '45%' }}
+                                            cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                        >
+                                            <Meta title={<Tooltip title={cartInfo.predict.target.name}>{cartInfo.predict.target.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
+                                                <div>Артикул: {cartInfo.predict.target.item_id}</div>
+                                                <div>Цена: {cartInfo.predict.target.price}₽</div>
+                                                <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
+                                            </Space>} />
+                                        </Card>
+                                    </Badge.Ribbon>
+                                </Col>
+                                <Col sm={16} md={2} style={{ alignContent: 'center', justifyContent: 'center', display: 'flex' }}>
+                                    {
+                                        cartInfo.predict.target.item_id === cartInfo.predict.candidate.item_id ? (
+                                            <CheckCircleTwoTone twoToneColor='#52c41a' style={{ fontSize: 50 }} />
+                                        ) : (
+                                            <CloseCircleTwoTone twoToneColor='#fadb14' style={{ fontSize: 50 }} />
+                                        )
+                                    }
+                                </Col>
+                                <Col sm={16} md={7}>
+                                    <Badge.Ribbon text="Рекомендовано" color="cyan" placement='start'>
+                                        <Card
+                                            hoverable
+                                            style={{ minWidth: 150, height: '45%' }}
+                                            cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                        >
+                                            <Meta title={<Tooltip title={cartInfo.predict.candidate.name}>{cartInfo.predict.candidate.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
+                                                <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
+                                                <div>Цена: {cartInfo.predict.candidate.price}₽</div>
+                                                <Tooltip title={cartInfo.predict.candidate.category_noun}>
+                                                    <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
+                                                </Tooltip>
+                                            </Space>} />
+                                        </Card>
+                                    </Badge.Ribbon>
+                                </Col>
+                            </Row>
+                            {/* <Space direction="horizontal"
+                                // size="middle"
+                                size={16}
+                                style={{ display: 'flex' }} split={<Divider />}>
                                 <Badge.Ribbon text="Куплено" >
                                     <Card
                                         hoverable
-                                        style={{ width: 300, height: '45%' }}
+                                        style={{ minWidth: 300, height: '45%' }}
                                         cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
                                     >
                                         <Meta title={cartInfo.predict.target.name} description={<Space direction="horizontal" split={'  '}>
@@ -166,7 +215,7 @@ export const CartChecking = (): JSX.Element => {
                                 <Badge.Ribbon text="Рекомендовано" color="cyan" placement='start'>
                                     <Card
                                         hoverable
-                                        style={{ width: 300, height: '45%' }}
+                                        style={{ minWidth: 200, height: '45%' }}
                                         cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
                                     >
                                         <Meta title={cartInfo.predict.candidate.name} description={<Space direction="horizontal" split={'  '}>
@@ -176,7 +225,7 @@ export const CartChecking = (): JSX.Element => {
                                         </Space>} />
                                     </Card>
                                 </Badge.Ribbon>
-                            </Space>
+                            </Space> */}
                         </>
                     )}
                 </>
