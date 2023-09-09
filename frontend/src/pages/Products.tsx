@@ -1,8 +1,8 @@
-import { DislikeOutlined, LikeOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Card, Divider, Form, Input, List, Segmented, Space, Spin, Typography, message } from 'antd';
+import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
+import { AutoComplete, Card, Divider, Input, List, Segmented, Spin, Typography, message } from 'antd';
 import axios from 'axios';
 import { basePath } from '../providers/env';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import "react-multi-carousel/lib/styles.css";
 
 import debounce from 'lodash.debounce';
@@ -75,9 +75,6 @@ export const Products = (): JSX.Element => {
         debounce(handleSearch, 550)
         , [selectedType]);
 
-    // const debouncedSearchHandler = useEffect(
-    //     debounce(handleSearch, 550), [searchString]);
-
     const onSearch = (searchText: string) => {
         setSearchString(searchText);
         debouncedSearchHandler(searchText);
@@ -115,7 +112,6 @@ export const Products = (): JSX.Element => {
             <AutoComplete
                 style={{ width: 500 }}
                 options={options}
-                // onSearch={debouncedSearchHandler}
                 onSearch={onSearch}
                 onSelect={onSelect}
                 notFoundContent={

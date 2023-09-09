@@ -1,10 +1,11 @@
-import { Alert, Avatar, Button, Card, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { CartInfo, ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
+import { Alert, AutoComplete, Avatar, Button, Card, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
 import axios from 'axios';
 import { basePath } from '../providers/env';
 import Meta from 'antd/es/card/Meta';
+import debounce from 'lodash.debounce';
 
 
 export const CartChecking = (): JSX.Element => {
@@ -14,6 +15,43 @@ export const CartChecking = (): JSX.Element => {
     const [cartInfo, setCartInfo] = useState<ICardInfoById>();
     const [cartId, setCartId] = useState<number>();
 
+    const [searchOptions, setSearchOptions] = useState<number[]>([]);
+    const [searchString, setSearchString] = useState<string>('');
+    const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    const handleSearch = (value: string) => {
+        setSearchOptions([]);
+        if (!value) return;
+        setIsSearching(true);
+        axios.get<number[]>(basePath + '/api/v1/matching/receipts', { params: { id: value } })
+            .then((response) => {
+                console.log(response.data)
+                setSearchOptions(response.data);
+            })
+            .catch(() => {
+                message.error('Загрузка данных не удалась.');
+            })
+            .finally(() => {
+                setIsSearching(false);
+            });
+    };
+
+    const debouncedSearchHandler = useCallback(
+        debounce(handleSearch, 550)
+        , []);
+
+    const onSearch = (searchText: string) => {
+        if (!/^[0-9]*$/.test(searchText)) return;
+        setSearchString(searchText);
+        debouncedSearchHandler(searchText);
+    };
+
+    const onSelect = (_: string, item: { value: number, title: string }) => {
+        console.log('onSelect', item.value);
+        setSearchString(String(item.value));
+        setSearchOptions([]);
+        onFinish({ cart_id: item.value });
+    };
 
     const onFinish = ({ cart_id }: { cart_id: number }) => {
         console.log('Success:', cart_id);
@@ -61,7 +99,22 @@ export const CartChecking = (): JSX.Element => {
                         { required: true, message: 'Идентификатор должен быть положительным числом', pattern: new RegExp(/^[0-9]+$/) },
                     ]}
                 >
-                    <Input />
+                    {/* <Input /> */}
+                    <AutoComplete
+                        style={{ width: 500 }}
+                        onSearch={onSearch}
+                        onSelect={onSelect}
+                        options={(searchOptions || []).map((d) => ({
+                            value: d,
+                            title: String(d),
+                        }))}
+                        notFoundContent={
+                            <div style={{ textAlign: 'center' }}>{isSearching ? <Spin size="small" /> : <Typography.Text type='secondary'>Ничего не найдено</Typography.Text>}
+                            </div>}
+                        value={searchString}
+                    >
+                        <Input size="large" placeholder="00000000000" />
+                    </AutoComplete>
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
@@ -82,7 +135,6 @@ export const CartChecking = (): JSX.Element => {
                                 <List.Item.Meta
                                     avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
                                     title={item.name}
-                                    // description={'Арт. ' + item.item_id}
                                     description={<Space direction="horizontal" split={'  '}>
                                         <div>Артикул: {item.item_id}</div>
                                         <div>{item.price}₽</div>

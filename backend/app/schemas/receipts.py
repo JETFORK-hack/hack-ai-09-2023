@@ -21,9 +21,17 @@ class ReceiptsOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ReceiptsByIdOut(BaseModel):
     items: list[ReceiptsOut]
     predict: ReceiptsOut | None
+
+    class Config:
+        orm_mode = True
+
+
+class ReceiptsIdsOut(BaseModel):
+    receipt_id: int
 
     class Config:
         orm_mode = True

@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.deps.db import get_async_session
 from app.models.receipts import Receipts
-from app.schemas.receipts import ReceiptsByIdOut, ReceiptsItemOut
-from sqlalchemy import exc, select
+from app.schemas.receipts import ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut
+from sqlalchemy import exc, select, cast, String
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
@@ -85,5 +85,31 @@ async def find_receipts_by_id(
                 )
         items = result.scalars().all()
         return ReceiptsByIdOut(items=items, predict=None)
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get('/receipts', tags=['matching'], summary='Поиск по номеру чека', 
+            response_model=list[int]
+)
+async def find_receipts(
+    session: AsyncSession = Depends(get_async_session),
+    _id: Annotated[int, Query(alias="id")] = None,
+):
+    try:
+        if _id:
+            result = await session.execute(
+                        select(Receipts.receipt_id)
+                        .distinct(Receipts.receipt_id)
+                        .where(cast(Receipts.receipt_id, String).like(f'%{_id}%'))
+                        .limit(10)
+                    )
+        else:
+            result = await session.execute(
+                        select(Receipts.receipt_id)
+                        .distinct(Receipts.receipt_id)
+                        .limit(10)
+                    )
+        r = result.scalars().all()
+        return r
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
