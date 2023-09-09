@@ -18,3 +18,4 @@ async_session_maker = async_sessionmaker(
 
 class Base(DeclarativeBase):
     id: Any
+

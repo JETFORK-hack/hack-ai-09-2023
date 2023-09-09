@@ -13,12 +13,13 @@ export default function Header() {
     const items = [
         {
             key: '1',
-            label: 'Hack-ai',
-            onClick: () => navigate('/'),
+            label: 'Проверка корзины',
+            onClick: () => navigate('/cart'),
         },
         {
             key: '2',
-            label: 'Hack-ai',
+            label: 'Проверка товаров',
+            onClick: () => navigate('/products'),
         },
     ]
 
@@ -35,8 +36,8 @@ export default function Header() {
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                 <Layout.Content style={{ padding: '0 50px', flex: 1, overflow: 'auto' }}>
                     <Breadcrumb style={{ margin: '16px 0' }}>
-                        <Breadcrumb.Item>JefFork</Breadcrumb.Item>
                         <Breadcrumb.Item>Hack-ai</Breadcrumb.Item>
+                        <Breadcrumb.Item>Всероссийский хакатон</Breadcrumb.Item>
                     </Breadcrumb>
                     <div style={{ background: colorBgContainer, padding: 30, paddingInline: 100 }}>
                         <Outlet />

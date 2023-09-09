@@ -6,7 +6,7 @@ from pydantic.networks import AnyHttpUrl
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "jetfork_expertise"
+    PROJECT_NAME: str = "jetfork_hack-ai"
 
     SENTRY_DSN: Optional[HttpUrl] = None
 
