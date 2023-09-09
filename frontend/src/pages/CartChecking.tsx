@@ -154,7 +154,31 @@ export const CartChecking = (): JSX.Element => {
                             <h1>К этой корзине рекомендуем</h1>
                             <Row gutter={16} align='middle' justify='center'>
                                 <Col sm={16} md={7}>
-                                    <Badge.Ribbon text="Куплено" >
+                                    <Card
+                                        hoverable
+                                        style={{ minWidth: 150, height: '45%' }}
+                                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                    >
+                                        <Meta title={<Tooltip title={cartInfo.predict.candidate.name}>{cartInfo.predict.candidate.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
+                                            <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
+                                            <div>Цена: {cartInfo.predict.candidate.price}₽</div>
+                                            <Tooltip title={'Категория: ' + cartInfo.predict.candidate.category_noun}>
+                                                <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
+                                            </Tooltip>
+                                        </Space>} />
+                                    </Card>
+                                </Col>
+                                <Col sm={16} md={2} style={{ alignContent: 'center', justifyContent: 'center', display: 'flex' }}>
+                                    {
+                                        cartInfo.predict.target.item_id === cartInfo.predict.candidate.item_id ? (
+                                            <CheckCircleTwoTone twoToneColor='#52c41a' style={{ fontSize: 50 }} />
+                                        ) : (
+                                            <></>
+                                        )
+                                    }
+                                </Col>
+                                <Col sm={16} md={7}>
+                                    <Badge.Ribbon text="Куплено" color="cyan" placement='start'>
                                         <Card
                                             hoverable
                                             style={{ minWidth: 150, height: '45%' }}
@@ -163,32 +187,8 @@ export const CartChecking = (): JSX.Element => {
                                             <Meta title={<Tooltip title={cartInfo.predict.target.name}>{cartInfo.predict.target.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
                                                 <div>Артикул: {cartInfo.predict.target.item_id}</div>
                                                 <div>Цена: {cartInfo.predict.target.price}₽</div>
-                                                <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
-                                            </Space>} />
-                                        </Card>
-                                    </Badge.Ribbon>
-                                </Col>
-                                <Col sm={16} md={2} style={{ alignContent: 'center', justifyContent: 'center', display: 'flex' }}>
-                                    {
-                                        cartInfo.predict.target.item_id === cartInfo.predict.candidate.item_id ? (
-                                            <CheckCircleTwoTone twoToneColor='#52c41a' style={{ fontSize: 50 }} />
-                                        ) : (
-                                            <CloseCircleTwoTone twoToneColor='#fadb14' style={{ fontSize: 50 }} />
-                                        )
-                                    }
-                                </Col>
-                                <Col sm={16} md={7}>
-                                    <Badge.Ribbon text="Рекомендовано" color="cyan" placement='start'>
-                                        <Card
-                                            hoverable
-                                            style={{ minWidth: 150, height: '45%' }}
-                                            cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
-                                        >
-                                            <Meta title={<Tooltip title={cartInfo.predict.candidate.name}>{cartInfo.predict.candidate.name}</Tooltip>} description={<Space direction="horizontal" split={'  '}>
-                                                <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
-                                                <div>Цена: {cartInfo.predict.candidate.price}₽</div>
-                                                <Tooltip title={cartInfo.predict.candidate.category_noun}>
-                                                    <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
+                                                <Tooltip title={'Категория: ' + cartInfo.predict.target.category_noun}>
+                                                    <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
                                                 </Tooltip>
                                             </Space>} />
                                         </Card>
