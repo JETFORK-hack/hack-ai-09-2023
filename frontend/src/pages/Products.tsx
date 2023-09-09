@@ -225,9 +225,13 @@ export const Products = (): JSX.Element => {
                 <Card
                     hoverable
                     style={{ width: 240 }}
-                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
-                    <Card.Meta title="Europe Street beat" description="www.instagram.com" />
+                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
                 </Card>
 
                 <Card
@@ -244,6 +248,10 @@ export const Products = (): JSX.Element => {
                 <Card
                     hoverable
                     style={{ width: 240 }}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
                     cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
                     <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
