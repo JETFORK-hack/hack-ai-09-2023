@@ -208,7 +208,7 @@ export const Products = (): JSX.Element => {
                     ]}
                     cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
-                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                    <Card.Meta title="Наименование товара" description="Описание товара" />
                 </Card>
                 <Card
                     hoverable
@@ -219,19 +219,7 @@ export const Products = (): JSX.Element => {
                     ]}
                     cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
-                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
-                </Card>
-
-                <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    actions={[
-                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                    ]}
-                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                >
-                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                    <Card.Meta title="Наименование товара" description="Описание товара" />
                 </Card>
 
                 <Card
@@ -243,7 +231,19 @@ export const Products = (): JSX.Element => {
                     ]}
                     cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
-                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                    <Card.Meta title="Наименование товара" description="Описание товара" />
+                </Card>
+
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                >
+                    <Card.Meta title="Наименование товара" description="Описание товара" />
                 </Card>
                 <Card
                     hoverable
@@ -254,14 +254,14 @@ export const Products = (): JSX.Element => {
                     ]}
                     cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                 >
-                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                    <Card.Meta title="Наименование товара" description="Описание товара" />
                 </Card>
                 <Card
                     hoverable
                     style={{ width: 240, marginBottom: 20 }}
                     cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
                 >
-                    <Card.Meta title="Europe Street beat" description="www.instagram.com" />
+                    <Card.Meta title="Europe Street beat" description="Описание товара" />
                 </Card>
             </Carousel>
             <br />
