@@ -16,6 +16,7 @@ class ReceiptsOut(BaseModel):
     type: str
     quantity: float
     price: float
+    category_noun: str
 
     class Config:
         orm_mode = True

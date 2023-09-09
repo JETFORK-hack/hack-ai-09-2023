@@ -28,6 +28,7 @@ export interface ICartInfo {
     type: string;
     quantity: number;
     price: number;
+    category_noun: string;
 }
 
 export interface ICardInfoById {

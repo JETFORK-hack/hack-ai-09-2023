@@ -1,4 +1,4 @@
-import { Alert, Avatar, Button, Card, Form, Input, List, Space, Spin, Typography, message } from 'antd';
+import { Alert, Avatar, Button, Card, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CartInfo, ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
@@ -83,9 +83,11 @@ export const CartChecking = (): JSX.Element => {
                                     avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
                                     title={item.name}
                                     // description={'Арт. ' + item.item_id}
-                                    description={<Space direction="horizontal" split=' '>
-                                        <div>Артикул {item.item_id}</div>
+                                    description={<Space direction="horizontal" split={'  '}>
+                                        <div>Артикул: {item.item_id}</div>
                                         <div>{item.price}₽</div>
+                                        <div>куплено - {item.quantity}</div>
+                                        <Tag color="magenta">{item.category_noun}</Tag>
                                     </Space>}
                                 />
                             </List.Item>
