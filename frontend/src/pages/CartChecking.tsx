@@ -1,4 +1,4 @@
-import { Alert, Avatar, Button, Card, Form, Input, List, Spin, Typography, message } from 'antd';
+import { Alert, Avatar, Button, Card, Form, Input, List, Space, Spin, Typography, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CartInfo, ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
@@ -42,9 +42,7 @@ export const CartChecking = (): JSX.Element => {
 
     return (
         <>
-
             <h1>Проверка корзины</h1>
-
             <Form
                 name="basic"
                 labelCol={{ span: 8 }}
@@ -58,7 +56,10 @@ export const CartChecking = (): JSX.Element => {
                 <Form.Item<string>
                     label="Идентификатор корзины"
                     name="cart_id"
-                    rules={[{ required: true, message: 'Без идентификатора корзины нельзя подобрать товар' }]}
+                    rules={[
+                        { required: true, message: 'Без идентификатора корзины нельзя подобрать товар' },
+                        { required: true, message: 'Идентификатор должен быть положительным числом', pattern: new RegExp(/^[0-9]+$/) },
+                    ]}
                 >
                     <Input />
                 </Form.Item>
@@ -68,7 +69,7 @@ export const CartChecking = (): JSX.Element => {
                         Проверить
                     </Button>
                 </Form.Item>
-            </Form>
+            </Form >
             {cartInfo?.items && cartInfo?.items.length > 0 && (
                 <>
                     <br />
@@ -81,7 +82,11 @@ export const CartChecking = (): JSX.Element => {
                                 <List.Item.Meta
                                     avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
                                     title={item.name}
-                                    description={'Арт. ' + item.item_id}
+                                    // description={'Арт. ' + item.item_id}
+                                    description={<Space direction="horizontal" split=' '>
+                                        <div>Артикул {item.item_id}</div>
+                                        <div>{item.price}₽</div>
+                                    </Space>}
                                 />
                             </List.Item>
                         )}
@@ -96,18 +101,20 @@ export const CartChecking = (): JSX.Element => {
                         <Meta title="Подобранный топ" description="786.12 ₽" />
                     </Card>
                 </>
-            )}
-            {cartInfo?.items && cartInfo?.items.length === 0 && (
-                <>
-                    <br />
-                    <Alert
-                        message="Корзина не найдена."
-                        description="Проверьте правильность идентификатора корзины."
-                        type='error'
-                        showIcon
-                    />
-                </>
             )
+            }
+            {
+                cartInfo?.items && cartInfo?.items.length === 0 && (
+                    <>
+                        <br />
+                        <Alert
+                            message="Корзина не найдена."
+                            description="Проверьте правильность идентификатора корзины."
+                            type='error'
+                            showIcon
+                        />
+                    </>
+                )
             }
         </>
     )

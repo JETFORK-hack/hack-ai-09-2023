@@ -1,4 +1,4 @@
-import { Avatar, Card, Divider, List, message } from 'antd';
+import { Avatar, Card, Divider, List, Space, message } from 'antd';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { basePath } from '../../providers/env';
@@ -26,6 +26,8 @@ export interface ICartInfo {
     item_id: number;
     name: string;
     type: string;
+    quantity: number;
+    price: number;
 }
 
 export interface ICardInfoById {
@@ -73,7 +75,11 @@ export const CartInfo = (): JSX.Element => {
                         <List.Item.Meta
                             avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
                             title={item.name}
-                            description={item.item_id + ' ' + item.type}
+                            description={item.item_id + ' ' + item.price + '₽'}
+                        // description={<Space direction="vertical">
+                        //     <div>Артикул {item.item_id}</div>
+                        //     <div>{item.price}₽</div>
+                        // </Space>}
                         />
                     </List.Item>
                 )}

@@ -12,3 +12,6 @@ class Receipts(Base):
     item_id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(primary_key=True)
+    quantity: Mapped[float] = mapped_column()
+    price: Mapped[float] = mapped_column()
+    category_noun: Mapped[str] = mapped_column()

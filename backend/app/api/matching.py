@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from app.deps.db import get_async_session
 from app.models.receipts import Receipts
 from app.schemas.receipts import ReceiptsByIdOut, ReceiptsItemOut
-from sqlalchemy import exc, select, or_
+from sqlalchemy import exc, select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 

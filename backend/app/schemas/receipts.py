@@ -14,6 +14,8 @@ class ReceiptsOut(BaseModel):
     item_id: int
     name: str
     type: str
+    quantity: float
+    price: float
 
     class Config:
         orm_mode = True

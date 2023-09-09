@@ -1,4 +1,4 @@
-import jetforkLogo from '../../logo_white_transporent.png';
+import jetforkLogo from '../../logo_black_transporent.png';
 import { Layout, Menu, Breadcrumb, theme } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 
@@ -26,11 +26,16 @@ export default function Header() {
 
     return (
         <Layout>
-            <Layout.Header style={{ display: 'flex', alignItems: 'center' }}>
+            <Layout.Header style={{
+                display: 'flex', alignItems: 'center',
+                backgroundColor: 'white',
+                // background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
+                // mixBlendMode: 'color-burn'
+            }}>
                 <a href='/' rel="noreferrer" style={{ height: '100%' }}>
                     <img src={jetforkLogo} style={{ height: '100%', paddingRight: 50 }} />
                 </a>
-                <Menu theme="dark" mode="horizontal" items={items}
+                <Menu theme='light' mode="horizontal" items={items}
                     defaultSelectedKeys={['1']} />
             </Layout.Header>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

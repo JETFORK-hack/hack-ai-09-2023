@@ -1,10 +1,12 @@
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Divider, Form, Input, List, Segmented, Space, Spin, Typography, message } from 'antd';
+import { DislikeOutlined, LikeOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Card, Divider, Form, Input, List, Segmented, Space, Spin, Typography, message } from 'antd';
 import axios from 'axios';
 import { basePath } from '../providers/env';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import "react-multi-carousel/lib/styles.css";
 
 import debounce from 'lodash.debounce';
+import Carousel from 'react-multi-carousel';
 
 const selectedTypeOptions = [
     {
@@ -111,7 +113,6 @@ export const Products = (): JSX.Element => {
             <br />
             <br />
             <AutoComplete
-                dropdownMatchSelectWidth={252}
                 style={{ width: 500 }}
                 options={options}
                 // onSearch={debouncedSearchHandler}
@@ -144,10 +145,117 @@ export const Products = (): JSX.Element => {
                     <div style={{ textAlign: 'center' }}>
                         <Button type="primary">Получить рекомендации</Button>
                     </div>
+
                 </>
             )}
             <br />
             <br />
+            <Divider>Рекомендации</Divider>
+            <br />
+            <Carousel
+                additionalTransfrom={0}
+                // arrows
+                autoPlay
+                autoPlaySpeed={3500}
+                // centerMode={false}
+                // className=""
+                // containerClass="container-with-dots"
+                // dotListClass=""
+                draggable
+                focusOnSelect={false}
+                infinite={false}
+                // itemClass=""
+                keyBoardControl
+                // minimumTouchDrag={80}
+                pauseOnHover
+                renderArrowsWhenDisabled={false}
+                renderButtonGroupOutside={false}
+                renderDotsOutside={false}
+                responsive={{
+                    superLargeDesktop: {
+                        breakpoint: { max: 4000, min: 3000 },
+                        items: 5,
+                        partialVisibilityGutter: 40,
+                    },
+                    desktop: {
+                        breakpoint: { max: 3000, min: 1700 },
+                        items: 4,
+                        partialVisibilityGutter: 30,
+                    },
+                    desktopMini: {
+                        breakpoint: { max: 1700, min: 1024 },
+                        partialVisibilityGutter: 30,
+                        items: 3,
+                    },
+                    tablet: {
+                        breakpoint: { max: 1024, min: 624 },
+                        items: 2
+                    },
+                    mobile: {
+                        breakpoint: { max: 624, min: 0 },
+                        items: 1
+                    }
+                }}
+                slidesToSlide={2}
+            // swipeable
+            >
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                >
+                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                </Card>
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                >
+                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                </Card>
+
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                >
+                    <Card.Meta title="Europe Street beat" description="www.instagram.com" />
+                </Card>
+
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    actions={[
+                        <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
+                        <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
+                    ]}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                >
+                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                </Card>
+                <Card
+                    hoverable
+                    style={{ width: 240 }}
+                    cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
+                >
+                    <Card.Meta title="Appending currency sign to a purchase form in your e-commerce site using plain JavaScript." description="www.instagram.com" />
+                </Card>
+                <Card
+                    hoverable
+                    style={{ width: 240, marginBottom: 20 }}
+                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                >
+                    <Card.Meta title="Europe Street beat" description="www.instagram.com" />
+                </Card>
+            </Carousel>
             <br />
         </>
     )
