@@ -31,9 +31,15 @@ export interface ICartInfo {
     category_noun: string;
 }
 
+interface ICardInfoPredict {
+    target?: ICartInfo;
+    candidate?: ICartInfo;
+    proba?: number;
+}
+
 export interface ICardInfoById {
     items: ICartInfo[];
-    predict: ICartInfo | null;
+    predict: ICardInfoPredict | null;
 }
 
 export const CartInfo = (): JSX.Element => {

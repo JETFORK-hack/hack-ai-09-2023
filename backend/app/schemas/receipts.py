@@ -21,10 +21,17 @@ class ReceiptsOut(BaseModel):
     class Config:
         orm_mode = True
 
+class PredictCartOut(BaseModel):
+    target: ReceiptsOut | None
+    candidate: ReceiptsOut | None
+    proba: float | None
+
+    class Config:
+        orm_mode = True
 
 class ReceiptsByIdOut(BaseModel):
     items: list[ReceiptsOut]
-    predict: ReceiptsOut | None
+    predict: PredictCartOut | None
 
     class Config:
         orm_mode = True

@@ -1,4 +1,4 @@
-import { Alert, AutoComplete, Avatar, Button, Card, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
+import { Alert, AutoComplete, Avatar, Badge, Button, Card, Divider, Form, Input, List, Space, Spin, Tag, Typography, message } from 'antd';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ICardInfoById, ICartInfo } from '../components/CartInfo/CartInfo';
@@ -146,14 +146,39 @@ export const CartChecking = (): JSX.Element => {
                         )}
                     />
                     <br />
-                    <h1>К этой корзине рекомендуем</h1>
-                    <Card
-                        hoverable
-                        style={{ width: 240 }}
-                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
-                    >
-                        <Meta title="Подобранный топ" description="786.12 ₽" />
-                    </Card>
+                    {cartInfo.predict && cartInfo.predict.target && cartInfo.predict.candidate && (
+                        <>
+                            <h1>К этой корзине рекомендуем</h1>
+                            <Space direction="horizontal" size="middle" style={{ display: 'flex' }} split={<Divider />}>
+                                <Badge.Ribbon text="Куплено" >
+                                    <Card
+                                        hoverable
+                                        style={{ width: 300, height: '45%' }}
+                                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                    >
+                                        <Meta title={cartInfo.predict.target.name} description={<Space direction="horizontal" split={'  '}>
+                                            <div>Артикул: {cartInfo.predict.target.item_id}</div>
+                                            <div>Цена: {cartInfo.predict.target.price}₽</div>
+                                            <Tag color="volcano">{cartInfo.predict.target.category_noun}</Tag>
+                                        </Space>} />
+                                    </Card>
+                                </Badge.Ribbon>
+                                <Badge.Ribbon text="Рекомендовано" color="cyan" placement='start'>
+                                    <Card
+                                        hoverable
+                                        style={{ width: 300, height: '45%' }}
+                                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
+                                    >
+                                        <Meta title={cartInfo.predict.candidate.name} description={<Space direction="horizontal" split={'  '}>
+                                            <div>Артикул: {cartInfo.predict.candidate.item_id}</div>
+                                            <div>Цена: {cartInfo.predict.candidate.price}₽</div>
+                                            <Tag color="volcano">{cartInfo.predict.candidate.category_noun}</Tag>
+                                        </Space>} />
+                                    </Card>
+                                </Badge.Ribbon>
+                            </Space>
+                        </>
+                    )}
                 </>
             )
             }

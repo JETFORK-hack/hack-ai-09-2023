@@ -1,11 +1,12 @@
 
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.deps.db import get_async_session
-from app.models.receipts import Receipts
-from app.schemas.receipts import ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut
+from app.models.receipts import PredictCart, Receipts
+from app.schemas.receipts import PredictCartOut, ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut
 from sqlalchemy import exc, select, cast, String
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -84,6 +85,27 @@ async def find_receipts_by_id(
                     .where(Receipts.receipt_id == _id)
                 )
         items = result.scalars().all()
+        predict = await session.execute(
+            select(PredictCart)
+            .where(PredictCart.receipt_id == _id)
+        )
+        predict = predict.scalars().first()
+        if predict:
+            target = session.execute(
+                select(Receipts)
+                .where(Receipts.item_id == predict.target)
+            )
+            candidate = session.execute(
+                select(Receipts)
+                .where(Receipts.item_id == predict.candidate)
+            )
+            target, candidate = await asyncio.gather(target, candidate)
+            return ReceiptsByIdOut(items=items, predict=PredictCartOut(
+                target=target.scalars().first(),
+                candidate=candidate.scalars().first(),
+                proba=predict.proba
+            ))
+        
         return ReceiptsByIdOut(items=items, predict=None)
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
