@@ -91,9 +91,9 @@ export const CartChecking = (): JSX.Element => {
                     <Card
                         hoverable
                         style={{ width: 240 }}
-                        cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                        cover={<img alt="example" src="https://png.pngtree.com/png-vector/20190115/ourmid/pngtree-two-cartons-stacking-goods-commodity-png-image_367984.jpg" />}
                     >
-                        <Meta title="Верблюд" description="786.12 ₽" />
+                        <Meta title="Подобранный топ" description="786.12 ₽" />
                     </Card>
                 </>
             )}

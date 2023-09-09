@@ -142,7 +142,7 @@ export const Products = (): JSX.Element => {
                     <br />
                     <br />
                     <div style={{ textAlign: 'center' }}>
-                        <Button type="primary">Подобрать похожие</Button>
+                        <Button type="primary">Получить рекомендации</Button>
                     </div>
                 </>
             )}
