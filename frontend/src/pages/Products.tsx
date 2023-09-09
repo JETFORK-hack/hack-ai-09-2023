@@ -208,7 +208,7 @@ export const Products = (): JSX.Element => {
                         >
                             <Card.Meta title="Наименование товара" description="Описание товара" />
                         </Card>
-                        <Card
+                        {/* <Card
                             hoverable
                             style={{ width: 240 }}
                             actions={[
@@ -264,7 +264,7 @@ export const Products = (): JSX.Element => {
                             cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
                         >
                             <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
+                        </Card> */}
                     </Carousel>
                     <br />
                 </>
