@@ -112,6 +112,6 @@ def predict(item_ids, device_id):
                                               axis=1
                                               )
     predict.drop(["category_noun", "category_noun_candidate"], axis=1, inplace=True)
-    predict["proba"] = (classifier.predict_proba(predict.drop([i for i in non_features if i != "y"], axis=1).fillna(0))[:, 1] * 100).round(2)
+    predict["proba"] = (classifier.predict_proba(predict.drop([i for i in non_features if i != "y"], axis=1))[:, 1] * 100).round(2)
 
     return predict.sort_values(by='proba', ascending=False).head(1)['candidate'].values[0]
