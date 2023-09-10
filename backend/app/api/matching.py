@@ -124,12 +124,14 @@ async def find_receipts(
                         select(Receipts.receipt_id)
                         .distinct(Receipts.receipt_id)
                         .where(cast(Receipts.receipt_id, String).like(f'%{_id}%'))
+                        .where(Receipts.val == True)
                         .limit(10)
                     )
         else:
             result = await session.execute(
                         select(Receipts.receipt_id)
                         .distinct(Receipts.receipt_id)
+                        .where(Receipts.val == True)
                         .limit(10)
                     )
         r = result.scalars().all()

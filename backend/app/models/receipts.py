@@ -27,6 +27,7 @@ class Receipts(Base):
     quantity: Mapped[float] = mapped_column()
     price: Mapped[float] = mapped_column()
     category_noun: Mapped[str] = mapped_column(ForeignKey("categories.category"))
+    val: Mapped[bool] = mapped_column()
     
     category: Mapped[Categories] = relationship("Categories", back_populates="receipts")
     # category = relationship("Categories", back_populates="receipts")
