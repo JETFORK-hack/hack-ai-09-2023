@@ -6,20 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const { Meta } = Card;
 
-const data = [
-    {
-        title: 'Товар в корзине №1',
-    },
-    {
-        title: 'Товар в корзине №2',
-    },
-    {
-        title: 'Товар в корзине №3',
-    },
-    {
-        title: 'Товар в корзине №4',
-    },
-];
 
 export interface ICartInfo {
     receipt_id: number;

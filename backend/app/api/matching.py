@@ -7,7 +7,8 @@ from sqlalchemy import exc, func, select, cast, String
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app.deps.db import get_async_session
-from app.deps.model.predict import predict
+from app.deps.model.cosmetics.predict import predict as cosmetics_predict
+from app.deps.model.super.predict import predict as super_predict
 from app.models.receipts import Categories, PredictCart, Receipts
 from app.schemas.receipts import PredictCartOut, ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut, ReceiptsOut
 
@@ -183,9 +184,15 @@ async def find_devices(
 async def cart_predict(
     device_id: int,
     items: list[int] = Body(..., title="Элементы корзины"),
+    _type: Annotated[str, Query(alias="type")] = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-    item_id = predict(tuple(items), device_id)
+    if _type == 'cosmetic':
+        item_id = cosmetics_predict(tuple(items), device_id)
+    elif _type == 'super':
+        item_id = super_predict(tuple(items), device_id)
+    else:
+        raise HTTPException(status_code=404, detail="Type not found")
     if not item_id:
         raise HTTPException(status_code=404, detail="Item not found")
     result = await session.execute(
