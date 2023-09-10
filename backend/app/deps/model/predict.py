@@ -1,73 +1,117 @@
-import re
 import joblib
-from app.deps.model.golden_name_extraction import find_golden_name
-from app.deps.model.candidates_extraction import get_candidates
-from app.deps.model.feature_generation import generate_features
-from app.deps.model.symbols import QUOTES
-
-dropcols = ["golden_name", "doc_name", "page_num", "candidate", "targets"]
-
-
-def get_raw_candidate(page: str, gold: str, candidate: str) -> str:
-    if gold[0] in QUOTES:
-        gold = gold[1:]
-    if gold[-1] in ['.', ',']:
-        gold = gold[:-1]
-    if gold[-1] in QUOTES:
-        gold = gold[:-1]
-
-    res_gold = re.findall(f'{gold[:7]}.*{gold[-7:]}', page, re.IGNORECASE)
-    if res_gold:
-        return res_gold[0]
-
-    res_cand = re.findall(
-        f'{candidate[:7]}.*{candidate[-7:]}', page, re.IGNORECASE)
-    if res_cand:
-        return res_cand[0]
-
-    return candidate
+import numpy as np
+import pandas as pd
+from scipy.sparse import csr_matrix
+from gensim.models.word2vec import Word2Vec
+from scipy.sparse import csr_matrix, load_npz
+from sklearn.metrics.pairwise import cosine_similarity
 
 
-def predict(all_documents: dict, golden_name: str = ''):
-    artifacts = joblib.load('/app/app/deps/model/artifacts.pkl')
-    classifier = artifacts['classifier']
-    best_threshold = artifacts['threshold']
-    if golden_name == '':
-        golden_name = find_golden_name(all_documents)
-    if golden_name:
-        candidates = get_candidates(all_documents, golden_name)
-        candidates = candidates.drop_duplicates(
-            ['golden_name', 'doc_name', 'page_num', 'candidate'])
+folder = './app/deps/model/'
 
-        print('golden_name', golden_name)
-        print('candidates.columns', candidates.columns)
-        print('candidates.isna().sum()', candidates.isna().sum())
-        print('candidates.shape', candidates.shape[0])
-        if candidates.empty:
-            return None
+pairs_cat = pd.read_csv(folder + 'pairs_categories.csv')
+pairs = pd.read_csv(folder + 'pairs.csv')
+item2category = pd.read_csv(folder + 'item_id_categ_map.csv', sep=';')
+receipt_2idx = pd.read_pickle(folder + 'receipt_2idx.pkl')
+item_2idx = pd.read_pickle(folder + 'item_2idx.pkl')
+idx_2item = pd.read_pickle(folder + 'idx_2item.pkl')
+quantity_total_hist_device = pd.read_csv(folder + 'quantity_total_hist_device.csv')
+quantity_total_hist = pd.read_csv(folder + 'quantity_total_hist.csv')
 
-        candidates_featured = generate_features(candidates)
-        candidates_featured['probability'] = classifier.predict_proba(
-            candidates_featured.drop(dropcols, axis=1))[:, 1]
-        candidates_featured['page_num'] = candidates_featured['page_num'] + 1
-        candidates_featured.loc[candidates_featured["targets"]
-                                == candidates_featured["candidate"], "probability"] = 1.
-        final_entities = candidates_featured[(
-            candidates_featured['probability'] > best_threshold)]
-        final_entities = final_entities.sort_values(
-            'probability', ascending=False)\
-            .groupby(["doc_name", "page_num", "golden_name", "targets"], sort=False)\
-            .agg({"candidate": "first",
-                  "probability": max})\
-            .reset_index()\
-            .sort_values(["page_num"])
-        final_entities['candidate'] = final_entities.apply(lambda x:
-                                                           get_raw_candidate(all_documents[x['doc_name']][x['page_num']-1]['text'],
-                                                                             x['golden_name'],
-                                                                             x['candidate']), axis=1)
-        final_entities["similarity"] = final_entities\
-            .apply(lambda x: len(set(x["candidate"].lower()) & set(x["golden_name"].lower())) / len(set(x["candidate"].lower() + x["golden_name"].lower())), axis=1)\
-            .astype(float)
-        return final_entities[["doc_name", "page_num", "golden_name", "targets", "candidate", "probability", "similarity"]]
+cat_model_cosmetic = Word2Vec.load(folder + 'word2vec.model')
+classifier = joblib.load(folder + 'classifier_model.joblib')['model']
+als_model = joblib.load(folder + 'candidate_model.joblib')['model']
+sparse_receipt_item = load_npz(folder + 'sparse_matrix.npz')
 
-    return None
+def get_als_embeddings(als_model):
+    # извлечение эмбедов из ALS
+    receipt_vecs = als_model.user_factors
+    item_vecs = als_model.item_factors
+
+    receipt_vecs_csr = csr_matrix(receipt_vecs)
+    item_vecs_csr = csr_matrix(item_vecs)
+
+    item_norms = np.sqrt((item_vecs * item_vecs).sum(axis=1))
+    return item_norms, item_vecs_csr, item_vecs, receipt_vecs_csr
+
+item_norms, item_vecs_csr, item_vecs, receipt_vecs_csr = get_als_embeddings(als_model)
+
+num_recs = 10
+non_features = ["device_id", "item_id", "candidate", "y"]
+
+def recommend_to_receipt(receipt_cat, sparse_user_item,
+                         receipt_vecs, item_vecs, idx_2item, num_items=5):
+
+    receipt_interactions = sparse_user_item[receipt_cat, :].toarray()
+
+    receipt_interactions = receipt_interactions.reshape(-1) + 1
+    receipt_interactions[receipt_interactions > 1] = 0
+
+    rec_vector = receipt_vecs[receipt_cat, :].dot(item_vecs.T).toarray()
+
+    recommend_vector = (receipt_interactions * rec_vector)[0]
+
+    item_idx = np.argsort(recommend_vector)[::-1][:num_items]
+
+    result = []
+
+    for idx in item_idx:
+        result.append((idx_2item[idx], recommend_vector[idx]))
+
+    return result
+
+
+def recommend_to_items(items_cat, item_norms, item_vecs, idx_2item, num_items=5):
+
+    scores = item_vecs.dot(item_vecs[items_cat].T).T  / item_norms.reshape(1, -1)
+    top_idx = np.argpartition(scores, -num_items, axis=1)[:, -(num_items+1):]
+    scores = np.array([scores[idx, row] for idx, row in enumerate(top_idx)])
+    scores = scores / item_norms[items_cat].reshape(-1, 1)
+    result = []
+    for i in sorted(zip(top_idx.reshape(-1), scores.reshape(-1)), key=lambda x: -x[1]):
+      if i[0] not in items_cat and idx_2item[i[0]] not in [j[0] for j in result]:
+        result.append((idx_2item[i[0]], i[1]))
+
+    return result[:num_items]
+
+
+def predict(item_ids, device_id):
+    predict = pd.DataFrame([device_id], columns = ["device_id"])
+    predict["item_id"] = [item_ids]
+
+
+    predict["receipt_cat"] = predict["item_id"].map(receipt_2idx.get)
+    predict["item_cat"] = predict["item_id"].apply(lambda x: [item_2idx.get(i) for i in x if i in item_2idx])
+    predict["preds"] = predict.apply(
+        lambda x:
+        recommend_to_receipt(int(x["receipt_cat"]), sparse_receipt_item, receipt_vecs_csr, item_vecs_csr, idx_2item, num_recs)
+        if not pd.isnull(x["receipt_cat"])
+        else recommend_to_items(x["item_cat"], item_norms, item_vecs, idx_2item, num_recs), axis=1)
+
+    predict = predict \
+      .drop(["receipt_cat", "item_cat"], axis=1) \
+      .explode("preds") \
+      .explode("item_id") \
+      .reset_index(drop=True)
+
+    predict = pd.concat([predict, pd.DataFrame(predict["preds"].tolist(), columns=["candidate", "als_score"])], axis=1) \
+      .drop(["preds"], axis=1)
+
+    predict = predict.merge(pairs, on=["item_id", "candidate"], how="left") \
+      .merge(quantity_total_hist_device.rename(columns={"item_id": "candidate"}), on=["device_id", "candidate"], how="left") \
+      .merge(quantity_total_hist.rename(columns={"item_id": "candidate"}), on=["candidate"], how="left")
+
+    predict = predict \
+      .merge(item2category, on=["item_id"], how="left") \
+      .merge(item2category.rename(columns={"item_id": "candidate", "category_noun": "category_noun_candidate"}), on=["candidate"], how="left") \
+      .merge(pairs_cat, on=["category_noun", "category_noun_candidate"], how="left")
+
+    predict.loc[predict["candidate"].notna(), "w2v_sim"] = predict[predict["candidate"].notna()].apply(lambda x: 
+                                              cosine_similarity(cat_model_cosmetic.wv.get_vector(x["category_noun"]).reshape(1, -1),
+                                                                cat_model_cosmetic.wv.get_vector(x["category_noun_candidate"]).reshape(1, -1))[0, 0],
+                                              axis=1
+                                              )
+    predict.drop(["category_noun", "category_noun_candidate"], axis=1, inplace=True)
+    predict["proba"] = (classifier.predict_proba(predict.drop([i for i in non_features if i != "y"], axis=1).fillna(0))[:, 1] * 100).round(2)
+
+    return predict.sort_values(by='proba', ascending=False).head(1)['candidate'].values[0]

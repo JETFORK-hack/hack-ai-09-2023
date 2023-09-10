@@ -10,6 +10,7 @@ class ReceiptsItemOut(BaseModel):
         orm_mode = True
 
 class ReceiptsOut(BaseModel):
+    # device_id: int
     receipt_id: int
     item_id: int
     name: str

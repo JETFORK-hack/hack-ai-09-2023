@@ -2,13 +2,14 @@
 import asyncio
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, HTTPException
-
-from app.deps.db import get_async_session
-from app.models.receipts import Categories, PredictCart, Receipts
-from app.schemas.receipts import PredictCartOut, ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut
+from fastapi import APIRouter, Body, Depends, Query, HTTPException
 from sqlalchemy import exc, func, select, cast, String
 from sqlalchemy.ext.asyncio.session import AsyncSession
+
+from app.deps.db import get_async_session
+from app.deps.model.predict import predict
+from app.models.receipts import Categories, PredictCart, Receipts
+from app.schemas.receipts import PredictCartOut, ReceiptsByIdOut, ReceiptsIdsOut, ReceiptsItemOut, ReceiptsOut
 
 
 router = APIRouter(prefix="/matching")
@@ -16,55 +17,38 @@ router = APIRouter(prefix="/matching")
 @router.get('/find_by_name', tags=['matching'], summary='Поиск товара по названию', 
             response_model=list[ReceiptsItemOut])
 async def find_product_by_name(
-    session: AsyncSession = Depends(get_async_session),
+    device_id: int,
+    _type: Annotated[str, Query(alias="type")],
     q: str | None = None,
-    _type: Annotated[str | None, Query(alias="type")] = None,
+    session: AsyncSession = Depends(get_async_session),
 ):
     try:
         result = None
-        if _type and q:
+        if q:
             if q.isdigit():
                 result = await session.execute(
                     select(Receipts)
                     .distinct(Receipts.name, Receipts.type, Receipts.item_id)
+                    .where(Receipts.device_id == device_id)
                     .where(Receipts.item_id == int(q))
-                    .where(Receipts.type.ilike(f'%{_type}%'))
-                    .limit(10)
-                )
-            else:
-                result = await session.execute(
-                    select(Receipts)
-                    .distinct(Receipts.name, Receipts.type, Receipts.item_id)
-                    .where(Receipts.name.ilike(f'%{q}%'))
                     .where(Receipts.type == _type)
                     .limit(10)
                 )
-        elif _type:
-            result = await session.execute(
-                select(Receipts)
-                .distinct(Receipts.name, Receipts.type, Receipts.item_id)
-                .where(Receipts.type == _type)
-                .limit(10)
-            )
-        elif q:
-            if q.isdigit():
-                result = await session.execute(
-                    select(Receipts)
-                    .distinct(Receipts.name, Receipts.type, Receipts.item_id)
-                    .where(Receipts.item_id == int(q))
-                    .limit(10)
-                )
             else:
                 result = await session.execute(
                     select(Receipts)
                     .distinct(Receipts.name, Receipts.type, Receipts.item_id)
+                    .where(Receipts.device_id == device_id)
                     .where(Receipts.name.ilike(f'%{q}%'))
+                    .where(Receipts.type == _type)
                     .limit(10)
                 )
         else:
             result = await session.execute(
                 select(Receipts)
                 .distinct(Receipts.name, Receipts.type, Receipts.item_id)
+                .where(Receipts.device_id == device_id)
+                .where(Receipts.type == _type)
                 .limit(10)
             )
         return result.scalars().all()
@@ -151,3 +135,63 @@ async def find_receipts(
         return r
     except exc.SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.get('/devices', tags=['matching'], summary='Код заведения', 
+            response_model=list[int]
+)
+async def find_devices(
+    session: AsyncSession = Depends(get_async_session),
+    _id: Annotated[int, Query(alias="id")] = None,
+    _type: Annotated[str | None, Query(alias="type")] = None,
+):
+    try:
+        if _id and _type:
+            result = await session.execute(
+                select(Receipts.device_id)
+                .distinct(Receipts.device_id)
+                .where(Receipts.type == _type)
+                .where(cast(Receipts.device_id, String).like(f'%{_id}%'))
+                .limit(10)
+            )
+        elif _type:
+            result = await session.execute(
+                select(Receipts.device_id)
+                .distinct(Receipts.device_id)
+                .where(Receipts.type == _type)
+                .limit(10)
+            )
+        else:
+            result = await session.execute(
+                select(Receipts.device_id)
+                .distinct(Receipts.device_id)
+                .where(Receipts.type == _type)
+                .limit(10)
+            )
+        r = result.scalars().all()
+        return r
+    except exc.SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+@router.post(
+        '/cart_predict', tags=['matching'], 
+        summary='Предсказание товара по корзине',
+        response_model=ReceiptsOut
+)
+async def cart_predict(
+    device_id: int,
+    items: list[int] = Body(..., title="Элементы корзины"),
+    session: AsyncSession = Depends(get_async_session),
+):
+    item_id = predict(tuple(items), device_id)
+    if not item_id:
+        raise HTTPException(status_code=404, detail="Item not found")
+    result = await session.execute(
+        select(Receipts)
+        .where(Receipts.item_id == item_id)
+        .order_by(Receipts.price.desc())
+        .limit(1)
+    )  
+    return result.scalars().first()

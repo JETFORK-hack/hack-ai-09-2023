@@ -1,14 +1,15 @@
 import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
-import { AutoComplete, Card, Divider, Input, List, Segmented, Spin, Typography, message } from 'antd';
+import { AutoComplete, Button, Card, Divider, Form, Input, List, Segmented, Select, Spin, Typography, message } from 'antd';
 import axios from 'axios';
 import { basePath } from '../providers/env';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import "react-multi-carousel/lib/styles.css";
 
 import debounce from 'lodash.debounce';
 import Carousel from 'react-multi-carousel';
+import { useNavigate } from 'react-router-dom';
 
-const selectedTypeOptions = [
+export const selectedTypeOptions = [
     {
         value: 'cosmetic',
         label: 'Косметика',
@@ -46,225 +47,157 @@ const renderItem = (item: ProductsGet): ProductsGetExtended => ({
 });
 
 export const Products = (): JSX.Element => {
-    const [options, setOptions] = useState<ProductsGetExtended[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [selectedItems, setSelectedItems] = useState<ProductsGet[]>([]);
-    const [searchString, setSearchString] = useState<string>('');
+    const [deviceOptions, setDeviceOptions] = useState<number[]>([]);
+    const [deviceIsLoading, setDeviceIsLoading] = useState<boolean>(false);
     const [selectedType, setSelectedType] = useState<string | number>(selectedTypeOptions[0].value);
+    const [deviceQuery, setDeviceQuery] = useState<string>('');
+
+    const navigate = useNavigate();
+
+    const handleChangeSelectedType = (value: string | number) => {
+        setSelectedType(value);
+    };
 
 
-    const handleSearch = (value: string) => {
-        console.log('Received values of form:', value, 'selectedType', selectedType);
-        setOptions([]);
+    const handleSearch = (value: string, type: string) => {
+        setDeviceOptions([]);
         if (!value) return;
-        setIsLoading(true);
-        axios.get<ProductsGet[]>(basePath + '/api/v1/matching/find_by_name', { params: { q: value, type: selectedType } })
+        setDeviceIsLoading(true);
+        axios.get<number[]>(basePath + '/api/v1/matching/devices', { params: { id: value, type } })
             .then((response) => {
                 console.log(response.data)
-                setOptions(response.data.map(renderItem));
+                setDeviceOptions(response.data);
             })
             .catch(() => {
-                message.error('Загрузка не удалась.');
+                message.error('Загрузка данных не удалась.');
             })
             .finally(() => {
-                setIsLoading(false);
+                setDeviceIsLoading(false);
             });
     };
 
     const debouncedSearchHandler = useCallback(
         debounce(handleSearch, 550)
-        , [selectedType]);
+        , []);
 
-    const onSearch = (searchText: string) => {
-        setSearchString(searchText);
-        debouncedSearchHandler(searchText);
+    const onSearch = (searchText: string, props: { type: string }) => {
+        console.log('onSearch', searchText, props.type);
+        if (!/^[0-9]*$/.test(searchText)) return;
+        setDeviceQuery(searchText);
+        debouncedSearchHandler(searchText, props.type);
     };
 
-    const onSelect = (_: string, option: ProductsGet) => {
-        console.log('onSelect', option);
-        setSearchString('');
-        setOptions([]);
-        setSelectedItems([...selectedItems, option]);
+    const onSelect = (_: string, item: { value: number, title: string }) => {
+        console.log('onSelect', item.value);
+        setDeviceQuery(String(item.value));
+        setDeviceOptions([]);
     };
 
-    const removeItem = (item: ProductsGet) => {
-        setSelectedItems(selectedItems.filter((i) => i.item_id !== item.item_id));
+
+    const onFinish = ({ type, device_id }: { type: string, device_id: number }) => {
+        navigate(`/products/${type}/${device_id}`);
     };
 
-    const handleChangeSelectedType = (value: string | number) => {
-        console.log('handleChangeSelectedType', value)
-        setSelectedType(value);
-        setOptions([]);
-        setSearchString('');
-    };
+    const [form] = Form.useForm();
+
+
+    useEffect(() => {
+        // form.setFieldsValue({ device_id: '' });
+        form.setFieldValue('device_id', '');
+    }, [selectedType]);
+
+
 
     return (
         <>
             <h1>Товары</h1>
-            <Typography.Text>Тип:{' '}</Typography.Text>
+            <Form
+                form={form}
+                name="basic"
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+                style={{ maxWidth: 600 }}
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                autoComplete="off"
+            >
+                <Form.Item
+                    label="Тип"
+                    name="type"
+                    rules={[{ required: true, message: 'Выберите тип' }]}
+                    initialValue={selectedTypeOptions[0].value}
+                >
+                    <Segmented options={selectedTypeOptions}
+                        value={selectedType}
+
+                        onChange={handleChangeSelectedType}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    label="ID заведения"
+                    name="device_id"
+                    rules={[{ required: true, message: 'Введите ID заведения' }]}
+                    dependencies={['type']}
+                >
+                    <Select
+                        filterOption={false}
+                        showSearch
+                        options={deviceOptions.map((id) => ({ value: id, title: String(id) }))} loading={deviceIsLoading}
+                        onSearch={(value: string) => {
+                            return onSearch(value, form.getFieldsValue());
+                        }}
+                        value={deviceQuery}
+                        onSelect={onSelect}
+                        onClear={() => {
+                            setDeviceQuery('');
+                        }}
+                        allowClear
+                        dropdownStyle={{ minWidth: 200 }}
+                        style={{ minWidth: 150 }}
+                        notFoundContent={
+                            <div style={{ textAlign: 'center' }}>{deviceIsLoading ? <Spin size="small" /> : <Typography.Text type='secondary'>Ничего не найдено</Typography.Text>}
+                            </div>}
+                    // disabled={!!deviceQuery}
+                    />
+                </Form.Item>
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button type="primary" htmlType="submit">
+                        Продолжить
+                    </Button>
+                </Form.Item>
+            </Form>
+            {/* <Typography.Text>Тип:{' '}</Typography.Text>
             <Segmented options={selectedTypeOptions}
                 value={selectedType}
                 onChange={handleChangeSelectedType}
-                disabled={selectedItems.length > 0}
+            // disabled={selectedItems.length > 0} 
             />
             <br />
+            {selectedType} {deviceQuery}
             <br />
-            <AutoComplete
-                style={{ width: 500 }}
-                options={options}
-                onSearch={onSearch}
-                onSelect={onSelect}
+            <Typography.Text>ID заведения:{' '}</Typography.Text>
+            <Select
+                filterOption={false}
+                showSearch
+                options={deviceOptions.map((id) => ({ value: id, label: String(id) }))} loading={deviceIsLoading}
+                onSearch={changeQueryDevice}
+                value={deviceQuery}
+                // onChange={(value) => debounceFetcher(value)}
+                onSelect={handleSelectDevice}
+                onClear={() => {
+                    setDeviceQuery('');
+                    setDeviceSelected(false);
+                }}
+                allowClear
+                dropdownStyle={{ minWidth: 200 }}
+                style={{ minWidth: 150 }}
                 notFoundContent={
-                    <div style={{ textAlign: 'center' }}>{isLoading ? <Spin size="small" /> : <Typography.Text type='secondary'>Ничего не найдено</Typography.Text>}
+                    <div style={{ textAlign: 'center' }}>{deviceIsLoading ? <Spin size="small" /> : <Typography.Text type='secondary'>Ничего не найдено</Typography.Text>}
                     </div>}
-                value={searchString}
-            >
-                <Input.Search size="large" placeholder="Название или id товара" enterButton loading={isLoading} />
-            </AutoComplete>
+            // disabled={!!deviceQuery}
+            /> */}
 
-            {selectedItems.length > 0 && (
-                <>
-                    <br />
-                    <br />
-                    <br />
-                    <Divider>Выбранные товары</Divider>
-                    <List
-                        bordered
-                        dataSource={selectedItems}
-                        renderItem={(item) => (
-                            <List.Item actions={[<a onClick={() => removeItem(item)}>Убрать</a>]}>
-                                <Typography.Text>{item.name}</Typography.Text>
-                            </List.Item>
-                        )}
-                    />
-                    <br />
-                </>
-            )}
-            <br />
-            <br />
-            {selectedItems.length > 0 &&
-                <>
-                    <Divider>Рекомендации</Divider>
-                    <br />
-                    <Carousel
-                        additionalTransfrom={0}
-                        // arrows
-                        autoPlay
-                        autoPlaySpeed={3500}
-                        // centerMode={false}
-                        // className=""
-                        // containerClass="container-with-dots"
-                        // dotListClass=""
-                        draggable
-                        focusOnSelect={false}
-                        infinite={false}
-                        // itemClass=""
-                        keyBoardControl
-                        // minimumTouchDrag={80}
-                        pauseOnHover
-                        renderArrowsWhenDisabled={false}
-                        renderButtonGroupOutside={false}
-                        renderDotsOutside={false}
-                        responsive={{
-                            superLargeDesktop: {
-                                breakpoint: { max: 4000, min: 3000 },
-                                items: 5,
-                                partialVisibilityGutter: 40,
-                            },
-                            desktop: {
-                                breakpoint: { max: 3000, min: 1700 },
-                                items: 4,
-                                partialVisibilityGutter: 30,
-                            },
-                            desktopMini: {
-                                breakpoint: { max: 1700, min: 1024 },
-                                partialVisibilityGutter: 30,
-                                items: 3,
-                            },
-                            tablet: {
-                                breakpoint: { max: 1024, min: 624 },
-                                items: 2
-                            },
-                            mobile: {
-                                breakpoint: { max: 624, min: 0 },
-                                items: 1
-                            }
-                        }}
-                        slidesToSlide={2}
-                    // swipeable
-                    >
-                        <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
-                        {/* <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
-
-                        <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
-
-                        <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
-                        <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card>
-                        <Card
-                            hoverable
-                            style={{ width: 240 }}
-                            actions={[
-                                <LikeOutlined onClick={() => message.success('Отзыв принят.')} key='good' />,
-                                <DislikeOutlined onClick={() => message.success('Отзыв принят.')} key='bad' />
-                            ]}
-                            cover={<img alt="example" src="https://images.unsplash.com/photo-1549396535-c11d5c55b9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60" />}
-                        >
-                            <Card.Meta title="Наименование товара" description="Описание товара" />
-                        </Card> */}
-                    </Carousel>
-                    <br />
-                </>
-            }
         </>
     )
 };

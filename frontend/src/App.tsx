@@ -5,6 +5,7 @@ import Header from './components/Header/Header';
 import { CartChecking } from './pages/CartChecking';
 import { Products } from './pages/Products';
 import { ConfigProvider, theme } from 'antd';
+import { ProductsWithDevice } from './pages/ProductsWithDevice';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             <Route path='cart' element={<CartChecking />} />
             <Route path='cart/:id' element={<CartChecking />} />
             <Route path='products' element={<Products />} />
+            <Route path='products/:selectedType/:deviceId' element={<ProductsWithDevice />} />
           </Route>
         </Routes>
       </BrowserRouter>
