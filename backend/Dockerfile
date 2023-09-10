@@ -6,6 +6,7 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
+
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
     cd /usr/local/bin && \
@@ -19,6 +20,11 @@ RUN poetry install --no-root
 COPY . /app
 
 FROM python:3.11-slim
+
+RUN apt-get update -y && apt-get upgrade -y && \
+    apt-get -y install libgomp1 && \
+    apt-get -y install libc-dev && \
+    apt-get -y install build-essential
 
 WORKDIR /app
 
